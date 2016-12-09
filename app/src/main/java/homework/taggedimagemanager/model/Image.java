@@ -2,6 +2,9 @@ package homework.taggedimagemanager.model;
 
 import android.net.Uri;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -93,5 +96,21 @@ public class Image extends DataEntity {
         int result = getId();
         result = 31 * result + getUri().hashCode();
         return result;
+    }
+
+    private void writeObject(ObjectOutputStream ostream) throws IOException {
+        ostream.writeInt(getId());
+        ostream.writeObject(getUri().toString());
+        ostream.writeObject(getDescription());
+        ostream.writeObject(getCreateTime());
+        ostream.writeObject(tags);
+    }
+
+    private void readObject(ObjectInputStream istream) throws IOException, ClassNotFoundException {
+        setId(istream.readInt());
+        setUri(Uri.parse((String)istream.readObject()));
+        setDescription((String)istream.readObject());
+        setCreateTime((Date)istream.readObject());
+        setTags((ArrayList<AbstractTag>)istream.readObject());
     }
 }

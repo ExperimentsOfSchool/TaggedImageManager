@@ -95,7 +95,7 @@ public class ImageListView extends GridView {
     }
 
     public interface EventHandler {
-        void onSelect(Image image, long position);
+        void onSelect(Image image, int position);
     }
 
     private EventHandler eventHandler;

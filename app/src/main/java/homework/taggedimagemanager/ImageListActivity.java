@@ -30,22 +30,21 @@ public class ImageListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startNewImageActivity();
             }
         });
 
         imageList = (ImageListView)findViewById(R.id.imageList);
         imageList.setEventHandler(new ImageListView.EventHandler() {
             @Override
-            public void onSelect(Image image, long position) {
+            public void onSelect(Image image, int position) {
                 startDetailActivity(image, position);
             }
         });
         imageList.setImages(DatabaseManager.getInstance().searchImage(""));
     }
 
-    private void startDetailActivity(Image image, long position) {
+    private void startDetailActivity(Image image, int position) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("images", (Serializable) imageList.getImages());
         intent.putExtra("currentIndex", position);
@@ -59,5 +58,13 @@ public class ImageListActivity extends AppCompatActivity {
     }
 
     @Override
-    public void on();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == START_DETAIL_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                Image newImage = (Image)data.getSerializableExtra("newImage");
+                this.imageList.addImage(newImage);
+            }
+        }
+    }
+
 }

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifError;
+import pl.droidsonroids.gif.GifIOException;
 
 
 /**
@@ -207,8 +209,8 @@ public class ImageSwitchViewer extends ImageSwitcher {
         try {
             GifDrawable drawable = new GifDrawable(new File(uri.getPath()));
             this.setImageDrawable(drawable);
-        } catch (IOException e) {
-            Log.w("setImageURI", e.toString());
+        } catch (GifIOException e) {
+            super.setImageURI(uri);
         }
 
     }

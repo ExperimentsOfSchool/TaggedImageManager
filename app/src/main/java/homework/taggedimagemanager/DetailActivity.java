@@ -56,7 +56,6 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent arguments = this.getIntent();
         newImage = arguments.getBooleanExtra("newImage", false);
-        newImage = false;
         if (!newImage) {
             List<Image> images = (List<Image>) arguments.getSerializableExtra("images");
 
