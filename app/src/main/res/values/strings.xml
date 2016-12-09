@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TaggedImageManager</string>
+    <string name="title_activity_image_list">ImageListActivity</string>
+</resources>
