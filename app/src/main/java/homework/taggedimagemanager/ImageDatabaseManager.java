@@ -23,7 +23,8 @@ public class ImageDatabaseManager extends DBManager {
         this.db = dbHelper.getReadableDatabase();
     }
     public List<Image> searchImage(String keyword) {
-        Cursor cursor = db.query("Image",
+        Cursor cursor = db.query(
+                "Image",
                 null,
                 "description like %" + keyword + "%",
                 null,
@@ -47,7 +48,8 @@ public class ImageDatabaseManager extends DBManager {
         return images;
     }
     public List<AbstractTag> searchTag(String keyword) {
-        Cursor cursor = db.query("Tag",
+        Cursor cursor = db.query(
+                "Tag",
                 null,
                 "title like %" + keyword + "%",
                 null,
@@ -59,10 +61,10 @@ public class ImageDatabaseManager extends DBManager {
         while(cursor.moveToNext()) {
             int idIndex = cursor.getColumnIndex("id");
             int titleIndex = cursor.getColumnIndex("title");
-            int parentIdIndex = cursor.getColumnIndex("parentId");
+//            int parentIdIndex = cursor.getColumnIndex("parentId"); //FIXME: Which object will use it?(index)
             int id = cursor.getInt(idIndex);
             String title = cursor.getString(titleIndex);
-//            int parentId = cursor.getInt(parentIdIndex); //FIXME: Which object will use it?
+//            int parentId = cursor.getInt(parentIdIndex); //FIXME: Which object will use it?(content)
             tags.add(new AbstractTag(id, title));
         }
         cursor.close();
@@ -78,7 +80,36 @@ public class ImageDatabaseManager extends DBManager {
             4. make tag
             5. return tag.
          */
-
+        int tagId = 0;
+        String tagTitle = "";
+        int parentId = 0;
+        Cursor cursor = db.query(
+                "Image",
+                new String[]{"parentId"},
+                "id = " + abstractTag.getId(),
+                null,
+                null,
+                null,
+                null
+                );
+        while(cursor.moveToNext()) {
+            int idIndex = cursor.getColumnIndex("parentId");
+            tagId = cursor.getInt(idIndex);
+        }
+        cursor = db.query(
+                "Image",
+                null,
+                "id = " + tagId,
+                null,
+                null,
+                null,
+                null
+        );
+        while(cursor.moveToNext()) {
+            int idIndex = cursor.getColumnIndex("id");
+            int titleIndex = cursor.getColumnIndex("title");
+            int parentIdIndex  = cursor.getColumnIndex("parentId");
+        }
         return null;
     }
 
