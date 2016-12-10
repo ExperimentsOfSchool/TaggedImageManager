@@ -9,7 +9,13 @@ import java.util.List;
  * Created by Lawrence on 10/12/2016.
  */
 public class ImageDatabaseManager extends DBManager {
-    public List<Image> searchImage(String keyword) {}
+    private static ImageDatabaseManager singleton;
+    private ImageDatabaseManager() {
+        // TODO: Constructor.
+    }
+    public List<Image> searchImage(String keyword) {
+
+    }
     public List<AbstractTag> searchTag(String keyword) {}
     public Tag getFullTag(AbstractTag abstractTag) {}
 
@@ -24,5 +30,10 @@ public class ImageDatabaseManager extends DBManager {
     public void updateImageTags(int targetId, List<AbstractTag> tags) {}
     public void deleteImage(int targetId) {}
 
-    public DBManager getInstance() {}
+    public DBManager getInstance() {
+        if(singleton == null) {
+            singleton = new ImageDatabaseManager();
+        }
+        return singleton;
+    }
 }
