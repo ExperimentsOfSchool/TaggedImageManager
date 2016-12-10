@@ -62,6 +62,7 @@ public class ImageListActivity extends AppCompatActivity {
         if (requestCode == START_DETAIL_ACTIVITY) {
             if (resultCode == RESULT_OK) {
                 Image newImage = (Image)data.getSerializableExtra("newImage");
+                Log.w("OnActivityResult", "UnSerializableFinished" + newImage.getTags().size());
                 this.imageList.addImage(newImage);
             }
         }

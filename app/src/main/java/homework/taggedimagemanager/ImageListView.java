@@ -1,6 +1,9 @@
 package homework.taggedimagemanager;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -17,6 +20,7 @@ import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 
+import java.io.File;
 import java.util.List;
 
 import homework.taggedimagemanager.model.Image;
@@ -50,9 +54,8 @@ public class ImageListView extends GridView {
         private class ImageItemView extends ImageView {
             private Image image;
 
-            public ImageItemView(Context context, Image image) {
+            public ImageItemView(Context context) {
                 super(context);
-                this.setImage(image);
                 this.setScaleType(ImageView.ScaleType.CENTER_CROP);
             }
 
@@ -60,9 +63,13 @@ public class ImageListView extends GridView {
                 return image;
             }
 
-            public void setImage(Image image) {
+            public void setImage(Image image, int size) {
                 this.image = image;
-                this.setImageURI(image.getUri());
+                Bitmap bitmap = BitmapFactory.decodeFile(image.getUri().getPath());
+                if (bitmap.getHeight() > size * 2 || bitmap.getWidth() > size * 2) {
+                    bitmap = ThumbnailUtils.extractThumbnail(bitmap, size, size);
+                }
+                this.setImageBitmap(bitmap);
             }
         }
 
@@ -83,14 +90,15 @@ public class ImageListView extends GridView {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Log.i("AdapterPosition", "" + position);
-            if (convertView == null) {
-                convertView = new ImageItemView(parent.getContext(), (Image)getItem(position));
-                convertView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, ((ImageListView)parent).getColumnWidth()));
-            } else {
-                ((ImageItemView)convertView).setImage((Image)getItem(position));
+            ImageItemView imageItemView = (ImageItemView)convertView;
+            int size = ((ImageListView)parent).getColumnWidth();
+            if (imageItemView == null) {
+                imageItemView = new ImageItemView(parent.getContext());
+                imageItemView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, size));
             }
-            return convertView;
+            imageItemView.setImage((Image)getItem(position), size);
+
+            return imageItemView;
         }
     }
 

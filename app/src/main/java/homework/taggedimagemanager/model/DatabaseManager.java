@@ -105,8 +105,9 @@ public class DatabaseManager {
     }
 
     public Image insertImage(Uri uri, String description, List<AbstractTag> tags) {
-        Image image = new Image(images.size(), uri, description, new Date(), (ArrayList<AbstractTag>) tags);
-        Log.i("DatabaseManager", "insertTag: " + image.toString());
+        Log.w("DatabaseManager", "insertImage new");
+        Image image = new Image(images.size(), uri, description, new Date(), new ArrayList<AbstractTag>());
+        Log.w("DatabaseManager", "insertImage: " + image.toString());
         images.add(image);
         return image;
     }

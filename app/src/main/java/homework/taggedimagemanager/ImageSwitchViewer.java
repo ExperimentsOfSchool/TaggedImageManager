@@ -106,6 +106,7 @@ class OnSwipeTouchListener implements View.OnTouchListener {
 public class ImageSwitchViewer extends ImageSwitcher {
     private ArrayList<Uri> uris;
     private int currentIndex;
+    private Uri currentUri;
 
     public interface OnChangeCallback {
         public void callback(Uri uri);
@@ -165,11 +166,7 @@ public class ImageSwitchViewer extends ImageSwitcher {
     }
 
     public Uri getCurrentUri() {
-        if (uris != null) {
-            return uris.get(currentIndex);
-        } else {
-            return getCurrentUri();
-        }
+        return currentUri;
     }
 
     private void callOnChange(Uri uri) {
@@ -206,11 +203,14 @@ public class ImageSwitchViewer extends ImageSwitcher {
 
     @Override
     public void setImageURI(Uri uri) {
+        currentUri = uri;
         try {
             GifDrawable drawable = new GifDrawable(new File(uri.getPath()));
             this.setImageDrawable(drawable);
         } catch (GifIOException e) {
             super.setImageURI(uri);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

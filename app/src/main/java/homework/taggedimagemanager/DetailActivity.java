@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -31,12 +30,10 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.w("onActivityResult", String.valueOf(requestCode) + " " + String.valueOf(resultCode));
-        this.resultCode = resultCode;
+        this.resultCode = resultCode == RESULT_OK ? RESULT_OK : resultCode;
         switch (requestCode) {
             case IMAGE_CHOOSE_CODE:
                 if (resultCode == RESULT_OK) {
-                    Log.w("onActivityResult", String.valueOf(imageSwitchViewer));
-                    Log.w("onActivityResult", String.valueOf(data.getData()));
                     imageSwitchViewer.setImageURI(data.getData());
                 }
                 break;
@@ -48,6 +45,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        resultCode = RESULT_CANCELED;
         imageSwitchViewer = (ImageSwitchViewer)findViewById(R.id.imageSwitcher);
         tagList = (ListView)findViewById(R.id.tagList);
         descriptionText = (EditText)findViewById(R.id.descriptionText);
@@ -97,11 +95,14 @@ public class DetailActivity extends AppCompatActivity {
         if (newImage) {
             Intent result = new Intent();
             if (resultCode == RESULT_OK) {
+                Log.w("DetailOnSave", "startInsert");
                 Image newImage = db.insertImage(imageSwitchViewer.getCurrentUri(), descriptionText.getText().toString(), new ArrayList<AbstractTag>());
+                Log.w("DetailOnSave", "startSerialize");
                 result.putExtra("newImage", newImage);
             }
             setResult(resultCode, result);
             this.finish();
+            Log.w("DetailOnSave", "finish");
         } else {
             Image currentImage = db.getImageByUri(imageSwitchViewer.getCurrentUri());
             String description = descriptionText.getText().toString();
