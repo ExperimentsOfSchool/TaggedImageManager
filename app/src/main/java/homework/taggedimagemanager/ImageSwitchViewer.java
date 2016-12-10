@@ -207,7 +207,7 @@ public class ImageSwitchViewer extends ImageSwitcher {
         try {
             GifDrawable drawable = new GifDrawable(new File(uri.getPath()));
             this.setImageDrawable(drawable);
-        } catch (GifIOException e) {
+        } catch (IOException e) {
             super.setImageURI(uri);
         } catch (IOException e) {
             e.printStackTrace();

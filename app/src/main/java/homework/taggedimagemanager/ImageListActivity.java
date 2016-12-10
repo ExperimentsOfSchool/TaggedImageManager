@@ -1,6 +1,7 @@
 package homework.taggedimagemanager;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,7 +17,7 @@ import homework.taggedimagemanager.model.Image;
 
 public class ImageListActivity extends AppCompatActivity {
     private ImageListView imageList;
-
+    private ImageDBHelper dbHelper;
     private int START_DETAIL_ACTIVITY;
 
     @Override
@@ -25,6 +26,8 @@ public class ImageListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        dbHelper = new ImageDBHelper(getApplicationContext());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
