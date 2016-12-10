@@ -23,10 +23,26 @@
             android:layout_height="wrap_content" />
 
 
-        <homework.taggedimagemanager.TagHorizontalListView
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tagList" />
+            android:layout_weight=".6">
+
+            <homework.taggedimagemanager.TagHorizontalListView
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:id="@+id/tagList"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/addTagButton"
+                android:layout_weight="1"
+                style="@style/Widget.AppCompat.Button.Small"
+                android:background="@android:drawable/ic_input_add" />
+        </LinearLayout>
 
         <EditText
             android:layout_width="match_parent"
@@ -36,7 +52,7 @@
             android:id="@+id/descriptionText" />
 
         <Button
-            android:text="Button"
+            android:text="Save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onSave"
