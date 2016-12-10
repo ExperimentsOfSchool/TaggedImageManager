@@ -93,6 +93,11 @@ public class DatabaseManager implements DBManager {
         return new ArrayList<AbstractTag>();
     }
 
+    @Override
+    public List<AbstractTag> getImageTags(int imageId) {
+        return null;
+    }
+
     public Tag getFullTag(AbstractTag abstractTag) {
         Log.i("DatabaseManager", "getFullTag: " + abstractTag.toString());
         return new Tag(1, "Tag1", new ArrayList<AbstractTag>());

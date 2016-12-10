@@ -26,7 +26,8 @@ public class ImageDBHelper extends SQLiteOpenHelper {
                 "(\n" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                 "    title VARCHAR(45) NOT NULL,\n" +
-                "    parentId INT\n" +
+                "    parentId INT,\n" +
+                "    CONSTRAINT table_name_Image_id_fk FOREIGN KEY (parentId) REFERENCES Tag (id) ON DELETE CASCADE ON UPDATE CASCADE\n" +
                 ");";
         String createImageTable = "CREATE TABLE IF NOT EXISTS Image\n" +
                 "(\n" +
@@ -39,8 +40,8 @@ public class ImageDBHelper extends SQLiteOpenHelper {
                 "(\n" +
                 "    imageId INTEGER,\n" +
                 "    tagId INTEGER,\n" +
-                "    CONSTRAINT table_name_Image_id_fk FOREIGN KEY (imageId) REFERENCES Image (id),\n" +
-                "    CONSTRAINT table_name_Tag_id_fk FOREIGN KEY (tagId) REFERENCES Tag (id)\n" +
+                "    CONSTRAINT table_name_Image_id_fk FOREIGN KEY (imageId) REFERENCES Image (id) ON DELETE CASCADE ON UPDATE CASCADE,\n" +
+                "    CONSTRAINT table_name_Tag_id_fk FOREIGN KEY (tagId) REFERENCES Tag (id) ON DELETE CASCADE ON UPDATE CASCADE\n" +
                 ");";
         db.execSQL(createImageTable);
         db.execSQL(createTagTable);
@@ -56,5 +57,10 @@ public class ImageDBHelper extends SQLiteOpenHelper {
         db.execSQL(dropImage);
         db.execSQL(dropTag);
         onCreate(db);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        db.execSQL("PRAGMA foreign_keys = ON;");
     }
 }

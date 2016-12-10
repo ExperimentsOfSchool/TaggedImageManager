@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -63,7 +64,7 @@ public class TagActivity extends AppCompatActivity {
 
             @Override
             public void onTagEdited(AbstractTag tag) {
-                modifyTag(tag);
+                modifyTagDialog(tag);
             }
 
             @Override
@@ -73,7 +74,7 @@ public class TagActivity extends AppCompatActivity {
 
             @Override
             public void onTagOpened(AbstractTag tag) {
-
+                openTagActivity(tag);
             }
         });
     }
@@ -97,6 +98,8 @@ public class TagActivity extends AppCompatActivity {
 
     private void addTag(String title) {
         AbstractTag tag = ImageDatabaseManager.getInstance().insertTag(root, title);
+        Log.w("addTag", tag.toString());
+        childTagListView.addTag(tag);
     }
 
     private void addTagDialog() {
@@ -110,6 +113,28 @@ public class TagActivity extends AppCompatActivity {
                 .setView(textTitle)
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
+                        addTag(textTitle.getText().toString());
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
+    }
+
+    private void modifyTagDialog(AbstractTag tag) {
+        final EditText textTitle = new EditText(this);
+
+        textTitle.setHint("Tag Title");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Input Tag Title")
+                .setMessage("Set the new title for the tag.")
+                .setView(textTitle)
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        modifyTag(tag, textTitle.getText().toString());
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -120,11 +145,14 @@ public class TagActivity extends AppCompatActivity {
     }
 
     private void deleteTag(AbstractTag tag) {
-        return;
+        childTagListView.deleteTag(tag);
+        ImageDatabaseManager.getInstance().deleteTag(tag.getId());
     }
 
-    private void modifyTag(AbstractTag tag) {
-        return;
+    private void modifyTag(AbstractTag tag, String newTitle) {
+        tag.setTitle(newTitle);
+        childTagListView.modifyTag(tag);
+        ImageDatabaseManager.getInstance().updateTagTitle(tag.getId(), tag.getTitle());
     }
 
     private void openTagActivity(AbstractTag tag) {

@@ -17,6 +17,8 @@ public interface DBManager {
 
     List<AbstractTag> searchTag(String keyword);
 
+    List<AbstractTag> getImageTags(int imageId);
+
     Tag getFullTag(AbstractTag abstractTag);
 
     AbstractTag insertTag(AbstractTag parent, String title);

@@ -2,10 +2,12 @@ package homework.taggedimagemanager;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import homework.taggedimagemanager.model.*;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,15 +26,27 @@ public class ImageDatabaseManager implements DBManager {
         this.db = dbHelper.getReadableDatabase();
     }
     public List<Image> searchImage(String keyword) {
-        Cursor cursor = db.query(
-                    "Image",
-                    null,
-                    keyword.equals("") ? null: "description like '%" + keyword + "%'",
-                    null,
+        Cursor cursor;
+        if (keyword.replace(" ", "").equals("")) {
+            cursor = db.query("Image",
                     null,
                     null,
-                    null
-            );
+                    null,
+                    null,
+                    null,
+                    null);
+        } else {
+            cursor = db.rawQuery("WITH RECURSIVE descend_of_target(id) as (\n" +
+                    "SELECT Tag.id FROM Tag WHERE title LIKE '%" + keyword + "%'\n" +
+                    "UNION ALL\n" +
+                    "SELECT Tag.id FROM Tag JOIN descend_of_target ON Tag.parentId = descend_of_target.id \n" +
+                    ")\n" +
+                    "SELECT * FROM Image WHERE description LIKE '%" + keyword + "%'\n" +
+                    "union\n" +
+                    "SELECT Image.* FROM Image join Belong on Image.id = Belong.imageId\n" +
+                    "WHERE tagId IN descend_of_target;", null);
+        }
+
 
         List<Image> images = new ArrayList<>();
         while(cursor.moveToNext()) {
@@ -44,7 +58,7 @@ public class ImageDatabaseManager implements DBManager {
             String uri = cursor.getString(uriIndex);
             Date createTime = new Date(cursor.getLong(createTimeIndex)); //FIXME: Unknown return type.
             String description = cursor.getString(descriptionIndex);
-            images.add(new Image(id, Uri.parse(uri), description, createTime));
+            images.add(new Image(id, Uri.parse(uri), description, createTime, getImageTags(id)));
         }
         cursor.close(); // Free resource.
         return images;
@@ -53,7 +67,7 @@ public class ImageDatabaseManager implements DBManager {
         Cursor cursor = db.query(
                 "Tag",
                 null,
-                keyword.equals("") ? null: "title like '%" + keyword + "%'",
+                keyword.equals("") ? "parentId IS NULL": "title like '%" + keyword + "%'",
                 null,
                 null,
                 null,
@@ -73,6 +87,24 @@ public class ImageDatabaseManager implements DBManager {
         return tags;
     }
 
+    public AbstractTag getTagById(int tagId) {
+        Cursor cursor  = db.query(
+                "Tag",
+                null,
+                "id = " + tagId,
+                null,
+                null,
+                null,
+                null
+        );
+
+        while (cursor.moveToNext()) {
+            return new AbstractTag(cursor.getInt(cursor.getColumnIndex("id")),
+                    cursor.getString(cursor.getColumnIndex("title")));
+        }
+        return null;
+    }
+
     public Tag getFullTag(AbstractTag abstractTag) {
 
         //TODO: Find Tag Object and return it.
@@ -83,43 +115,12 @@ public class ImageDatabaseManager implements DBManager {
             4. make tag
             5. return tag.
          */
-        int tagId = 0;
-        String tagTitle = "";
-        int parentId = 0;
+
+        ArrayList<AbstractTag> tags = new ArrayList<>();
         Cursor cursor = db.query(
                 "Tag",
                 null,
-                "id = " + abstractTag.getId(),
-                null,
-                null,
-                null,
-                null
-                );
-        while(cursor.moveToNext()) {
-            int idIndex = cursor.getColumnIndex("parentId");
-            tagId = cursor.getInt(idIndex);
-        }
-        cursor = db.query(
-                "Tag",
-                null,
-                "id = " + tagId,
-                null,
-                null,
-                null,
-                null
-        );
-        while(cursor.moveToNext()) {
-            int titleIndex = cursor.getColumnIndex("title");
-            int parentIdIndex  = cursor.getColumnIndex("parentId");
-            tagTitle = cursor.getString(titleIndex);
-            parentId = cursor.getInt(parentIdIndex);
-        }
-
-        ArrayList<AbstractTag> tags = new ArrayList<>();
-        cursor = db.query(
-                "Tag",
-                null,
-                "parentId = " + tagId,
+                "parentId = " + abstractTag.getId(),
                 null,
                 null,
                 null,
@@ -132,9 +133,30 @@ public class ImageDatabaseManager implements DBManager {
             String title = cursor.getString(titleIndex);
             tags.add(new AbstractTag(id, title));
         }
+
         cursor.close();
-        return new Tag(tagId, tagTitle, tags);
+        return new Tag(abstractTag.getId(), abstractTag.getTitle(), tags);
     }
+
+    public ArrayList<AbstractTag> getImageTags(int imageId) {
+        Cursor cursor = db.query(
+                "Belong",
+                null,
+                "imageId = " + imageId,
+                null,
+                null,
+                null,
+                null
+        );
+
+        ArrayList<AbstractTag> result = new ArrayList<AbstractTag>();
+        while (cursor.moveToNext()) {
+            int tagId = cursor.getInt(cursor.getColumnIndex("tagId"));
+            result.add(getTagById(tagId));
+        }
+        return result;
+    }
+
     public Image getImageByUri(Uri targetUri) {
         Cursor cursor = db.query(
                 "Image",
@@ -154,10 +176,11 @@ public class ImageDatabaseManager implements DBManager {
             Date time = new Date(cursor.getLong(timeIndex));
             Uri uri = Uri.parse(cursor.getString(uriIndex));
             String description = cursor.getString(descriptionIndex);
-            return new Image(id, uri, description, time);
+            return new Image(id, uri, description, time, getImageTags(id));
         }
         return null;
     }
+
     public Image getImageById(int targetId) {
         Cursor cursor = db.query(
                 "Image",
@@ -168,13 +191,23 @@ public class ImageDatabaseManager implements DBManager {
                 null,
                 null
         );
-        return null;
+        if (cursor.moveToNext()) {
+            int imageId = cursor.getInt(cursor.getColumnIndex("id"));
+            return new Image(imageId,
+                    Uri.parse(cursor.getString(cursor.getColumnIndex("uri"))),
+                    cursor.getString(cursor.getColumnIndex("description")),
+                    null,
+                    getImageTags(imageId)
+                    );
+        } else {
+            return null;
+        }
     }
 
     public AbstractTag insertTag(AbstractTag parent, String title) {
         ContentValues values = new ContentValues();
         values.put("title", title);
-        values.put("parentId", parent.getId());
+        values.put("parentId", parent != null? parent.getId() : null);
         long id = db.insert(
                 "Tag",
                 null,
@@ -232,6 +265,9 @@ public class ImageDatabaseManager implements DBManager {
     public void updateImageTags(int targetId, List<AbstractTag> tags) {
         final String sqlStart = "INSERT INTO Belong (imageId, tagId) VALUES (";
         final String sqlEnd = ");";
+
+        db.execSQL("DELETE FROM Belong WHERE imageId = " + targetId + ";");
+
         for(AbstractTag tag : tags) {
             String sql = sqlStart + targetId + ", " + tag.getId() + sqlEnd;
             db.execSQL(sql);

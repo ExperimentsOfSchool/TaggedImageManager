@@ -1,5 +1,8 @@
 package homework.taggedimagemanager;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,7 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +21,8 @@ import java.util.List;
 import homework.taggedimagemanager.model.AbstractTag;
 import homework.taggedimagemanager.model.DBManager;
 import homework.taggedimagemanager.model.Image;
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifIOException;
 
 public class DetailActivity extends AppCompatActivity {
     private boolean newImage;
@@ -27,6 +35,8 @@ public class DetailActivity extends AppCompatActivity {
     private TagHorizontalListView tagList;
 
     private DBManager db;
+    private boolean isImageFitToScreen;
+    private Image image;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -38,11 +48,16 @@ public class DetailActivity extends AppCompatActivity {
             case IMAGE_CHOOSE_CODE:
                 if (resultCode == RESULT_OK) {
                     imageSwitchViewer.setImageURI(data.getData());
+                } else {
+                    setResult(resultCode, new Intent());
+                    finish();
                 }
                 break;
             case TAG_CHOOSE_CODE:
                 if (resultCode == RESULT_OK) {
                     addTag((AbstractTag)data.getSerializableExtra("tag"));
+                } else if (!newImage) {
+                    tagList.setTags(ImageDatabaseManager.getInstance().getImageTags(image.getId()));
                 }
         }
     }
@@ -79,12 +94,20 @@ public class DetailActivity extends AppCompatActivity {
             List<Image> images = (List<Image>) arguments.getSerializableExtra("images");
 
             ArrayList<Uri> uris = new ArrayList<Uri>();
-
             for (Image image : images) {
                 uris.add(image.getUri());
             }
             imageSwitchViewer.setUris(uris);
-            imageSwitchViewer.setCurrentIndex((arguments.getIntExtra("currentIndex", uris.size() / 2)));
+            int currentIndex = arguments.getIntExtra("currentIndex", uris.size() / 2);
+            imageSwitchViewer.setCurrentIndex(currentIndex);
+            image = images.get(currentIndex);
+            image = ImageDatabaseManager.getInstance().getImageById(image.getId());
+
+            descriptionText.setText(image.getDescription());
+            tagList.setTags(image.getTags());
+
+
+
         } else {
             chooseImage();
         }
@@ -98,7 +121,25 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void detailImageView() {
+        Dialog dialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        TouchImageView imageView = new TouchImageView(getApplicationContext());
 
+        try {
+            imageView.setImageDrawable(new GifDrawable(new File(image.getUri().getPath())));
+        } catch (GifIOException e) {
+            imageView.setImageURI(image.getUri());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.cancel();
+            }
+        });
+        dialog.setContentView(imageView);
+        dialog.show();
     }
 
     public void imageSwitcherOnClick(View view) {
@@ -110,7 +151,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void onChange(Uri uri) {
-        Image image = db.getImageByUri(uri);
+        image = db.getImageByUri(uri);
         descriptionText.setText(image.getDescription());
         tagList.setTags(image.getTags());
         Log.w("OnChange", "onChange" + image.getTags().toString());
@@ -136,9 +177,14 @@ public class DetailActivity extends AppCompatActivity {
             if (!description.equals(currentImage.getDescription())) {
                 db.updateImageDescription(currentImage.getId(), description);
             }
+
+            Log.w("tags", tags.toString() + " " + currentImage.getTags());
             if (!currentImage.getTags().equals(tags)) {
+                Log.w("tags", "updateTags" + tags.toString());
                 db.updateImageTags(currentImage.getId(), tags);
             }
+
+            finish();
         }
     }
 
@@ -146,5 +192,9 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TagActivity.class);
         intent.putExtra("children", (Serializable)ImageDatabaseManager.getInstance().searchTag(""));
         startActivityForResult(intent, TAG_CHOOSE_CODE);
+    }
+
+    public void addTagActivity(View view) {
+        addTagActivity();
     }
 }

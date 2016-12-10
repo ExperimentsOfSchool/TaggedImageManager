@@ -6,10 +6,13 @@ import android.util.EventLog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import homework.taggedimagemanager.model.AbstractTag;
@@ -19,8 +22,28 @@ import homework.taggedimagemanager.model.AbstractTag;
  */
 
 public class ChildTagListView extends ListView {
+    public void addTag(AbstractTag tag) {
+        getAdapter().getTags().add(tag);
+        getAdapter().notifyDataSetChanged();
+    }
+
+    public void deleteTag(AbstractTag tag) {
+        getAdapter().getTags().remove(tag);
+        getAdapter().notifyDataSetChanged();
+    }
+
+    public void modifyTag(AbstractTag tag) {
+        int index = getAdapter().getTags().indexOf(tag);
+        getAdapter().getTags().set(index, tag);
+        getAdapter().notifyDataSetChanged();
+    }
+
     class ChildTagListAdapter extends BaseAdapter {
         private List<AbstractTag> tags;
+
+        public ChildTagListAdapter(List<AbstractTag> tags) {
+            this.tags = tags;
+        }
 
         public List<AbstractTag> getTags() {
             return tags;
@@ -29,10 +52,6 @@ public class ChildTagListView extends ListView {
         public void setTags(List<AbstractTag> tags) {
             this.tags = tags;
             this.notifyDataSetChanged();
-        }
-
-        public ChildTagListAdapter(List<AbstractTag> tags) {
-            this.tags = tags;
         }
 
         @Override
@@ -54,7 +73,7 @@ public class ChildTagListView extends ListView {
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
                 LayoutInflater layoutInflater = (LayoutInflater)viewGroup.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = layoutInflater.inflate(R.layout.child_tag_item, viewGroup);
+                view = layoutInflater.inflate(R.layout.child_tag_item, null);
             }
 
             EventHandler eventHandler = ((ChildTagListView)viewGroup).getEventHandler();
@@ -92,7 +111,7 @@ public class ChildTagListView extends ListView {
                 }
             });
 
-            TextView title = (TextView)findViewById(R.id.titleText);
+            TextView title = (TextView)view.findViewById(R.id.titleText);
             title.setText(tag.getTitle());
             return view;
         }
@@ -117,6 +136,7 @@ public class ChildTagListView extends ListView {
 
     public ChildTagListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setAdapter(new ChildTagListAdapter(new ArrayList<AbstractTag>()));
     }
 
     public ChildTagListAdapter getAdapter() {
