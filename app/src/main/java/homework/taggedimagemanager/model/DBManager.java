@@ -5,24 +5,33 @@ import android.net.Uri;
 import java.util.List;
 
 /**
- * Created by Lawrence on 10/12/2016.
+ * Created by rtnelo on 16-12-6.
  */
+
 public interface DBManager {
-    public List<Image> searchImage(String keyword);
-    public List<AbstractTag> searchTag(String keyword);
-    public Tag getFullTag(AbstractTag abstractTag);
+    List<Image> searchImage(String keyword);
 
+    Image getImageById(int targetId);
 
-    public int insertTag(AbstractTag parent, AbstractTag newTag);
-    public void updateTagTitle(int targetId, String title);
-    public void deleteTag(int targetId);
+    Image getImageByUri(Uri targetUri);
 
-    public int insertImage(Image image);
-    public void updateImageUri(int targetId, Uri uri);
-    public void updateImageDescription(int targetId, String description);
-    public void updateImageTags(int targetId, List<AbstractTag> tags);
-    public void deleteImage(int targetId);
+    List<AbstractTag> searchTag(String keyword);
 
-    public DBManager getInstance();
+    Tag getFullTag(AbstractTag abstractTag);
+
+    AbstractTag insertTag(AbstractTag parent, String title);
+
+    void updateTagTitle(int targetId, String title);
+
+    void deleteTag(int targetId);
+
+    Image insertImage(Uri uri, String description, List<AbstractTag> tags);
+
+    void updateImageUri(int targetId, Uri uri);
+
+    void updateImageDescription(int targetId, String description);
+
+    void updateImageTags(int targetId, List<AbstractTag> tags);
+
+    void deleteImage(int targetId);
 }
-
