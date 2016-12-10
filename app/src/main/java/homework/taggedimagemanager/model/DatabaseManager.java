@@ -54,7 +54,11 @@ public class DatabaseManager {
 
     public List<Image> searchImage(String keyword) {
         Log.i("DatabaseManager", "Search: " + keyword);
-        return images;
+        if (keyword.length() > 4) {
+            return images.subList(0, images.size() / 2);
+        } else {
+            return images;
+        }
     }
 
     public Image getImageById(int targetId) {

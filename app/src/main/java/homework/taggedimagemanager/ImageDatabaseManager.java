@@ -70,6 +70,7 @@ public class ImageDatabaseManager extends DBManager {
         cursor.close();
         return tags;
     }
+
     public Tag getFullTag(AbstractTag abstractTag) {
 
         //TODO: Find Tag Object and return it.

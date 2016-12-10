@@ -40,7 +40,6 @@ public class AbstractTag extends DataEntity {
 
         AbstractTag that = (AbstractTag) o;
 
-        if (getId() != that.getId()) return false;
         return getTitle().equals(that.getTitle());
 
     }

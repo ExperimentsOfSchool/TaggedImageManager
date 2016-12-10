@@ -16,6 +16,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -23,6 +24,10 @@
             android:name=".DetailActivity"
             android:label="ImageManager"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TagActivity"
+            android:label="@string/title_activity_tag"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
