@@ -26,6 +26,7 @@ public class ImageDBHelper extends SQLiteOpenHelper {
                 "(\n" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                 "    title VARCHAR(45) NOT NULL,\n" +
+                "    description VARCHAR(45) NULL,\n" +
                 "    parentId INT\n" +
                 ");";
         String createTagTable = "CREATE TABLE IF NOT EXISTS Image\n" +

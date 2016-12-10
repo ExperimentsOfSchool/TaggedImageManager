@@ -1,5 +1,7 @@
 package homework.taggedimagemanager;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import homework.taggedimagemanager.model.*;
 
@@ -10,14 +12,36 @@ import java.util.List;
  */
 public class ImageDatabaseManager extends DBManager {
     private static ImageDatabaseManager singleton;
-    private ImageDatabaseManager() {
+    private SQLiteDatabase db;
+    private ImageDBHelper dbHelper;
+    private ImageDatabaseManager(ImageDBHelper dbHelper) {
         // TODO: Constructor.
+        this.dbHelper = dbHelper;
+        this.db = dbHelper.getReadableDatabase();
     }
     public List<Image> searchImage(String keyword) {
+        Cursor cursor = db.query("Image",
+                null,
+                "  ",
+                null,
+                null,
+                null,
+                null
+                );
+    }
+    public List<AbstractTag> searchTag(String keyword) {
+        Cursor cursor = db.query("Tag",
+                null,
+                " = ",
+                null,
+                null,
+                null,
+                null
+        );
 
     }
-    public List<AbstractTag> searchTag(String keyword) {}
-    public Tag getFullTag(AbstractTag abstractTag) {}
+    public Tag getFullTag(AbstractTag abstractTag) {
+    }
 
 
     public int insertTag(AbstractTag parent, AbstractTag newTag) {}
@@ -30,9 +54,12 @@ public class ImageDatabaseManager extends DBManager {
     public void updateImageTags(int targetId, List<AbstractTag> tags) {}
     public void deleteImage(int targetId) {}
 
-    public DBManager getInstance() {
+    public DBManager getInstance(ImageDBHelper dbHelper) {
         if(singleton == null) {
-            singleton = new ImageDatabaseManager();
+            singleton = new ImageDatabaseManager(dbHelper);
+        } else {
+            this.dbHelper = dbHelper;
+            this.db = dbHelper.getReadableDatabase();
         }
         return singleton;
     }
