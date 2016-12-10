@@ -22,17 +22,17 @@ public class ImageDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createImageTable = "CREATE TABLE IF NOT EXISTS Image\n" +
+        String createTagTable = "CREATE TABLE IF NOT EXISTS Tag\n" +
                 "(\n" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                 "    title VARCHAR(45) NOT NULL,\n" +
-                "    description VARCHAR(45) NULL,\n" +
                 "    parentId INT\n" +
                 ");";
-        String createTagTable = "CREATE TABLE IF NOT EXISTS Image\n" +
+        String createImageTable = "CREATE TABLE IF NOT EXISTS Image\n" +
                 "(\n" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                 "    uri VARCHAR(45) NOT NULL,\n" +
+                "    description VARCHAR(45) NULL,\n" +
                 "    createTime TIMESTAMP DEFAULT (datetime('now','localtime')) NOT NULL\n" +
                 ");";
         String createBelongTable = "CREATE TABLE IF NOT EXISTS Belong\n" +
