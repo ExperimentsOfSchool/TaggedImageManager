@@ -1,5 +1,6 @@
 package homework.taggedimagemanager;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -13,7 +14,7 @@ import java.util.List;
  * Created by Lawrence on 10/12/2016.
  *
  */
-public class ImageDatabaseManager extends DBManager {
+public class ImageDatabaseManager implements DBManager {
     private static ImageDatabaseManager singleton;
     private SQLiteDatabase db;
     private ImageDBHelper dbHelper;
@@ -61,10 +62,10 @@ public class ImageDatabaseManager extends DBManager {
         while(cursor.moveToNext()) {
             int idIndex = cursor.getColumnIndex("id");
             int titleIndex = cursor.getColumnIndex("title");
-//            int parentIdIndex = cursor.getColumnIndex("parentId"); //FIXME: Which object will use it?(index)
+            int parentIdIndex = cursor.getColumnIndex("parentId");
             int id = cursor.getInt(idIndex);
             String title = cursor.getString(titleIndex);
-//            int parentId = cursor.getInt(parentIdIndex); //FIXME: Which object will use it?(content)
+            int parentId = cursor.getInt(parentIdIndex);
             tags.add(new AbstractTag(id, title));
         }
         cursor.close();
@@ -85,8 +86,8 @@ public class ImageDatabaseManager extends DBManager {
         String tagTitle = "";
         int parentId = 0;
         Cursor cursor = db.query(
-                "Image",
-                new String[]{"parentId"},
+                "Tag",
+                null,
                 "id = " + abstractTag.getId(),
                 null,
                 null,
@@ -98,7 +99,7 @@ public class ImageDatabaseManager extends DBManager {
             tagId = cursor.getInt(idIndex);
         }
         cursor = db.query(
-                "Image",
+                "Tag",
                 null,
                 "id = " + tagId,
                 null,
@@ -107,18 +108,78 @@ public class ImageDatabaseManager extends DBManager {
                 null
         );
         while(cursor.moveToNext()) {
-            int idIndex = cursor.getColumnIndex("id");
             int titleIndex = cursor.getColumnIndex("title");
             int parentIdIndex  = cursor.getColumnIndex("parentId");
+            tagTitle = cursor.getString(titleIndex);
+            parentId = cursor.getInt(parentIdIndex);
+        }
+
+        ArrayList<AbstractTag> tags = new ArrayList<>();
+        cursor = db.query(
+                "Tag",
+                null,
+                "parentId = " + tagId,
+                null,
+                null,
+                null,
+                null
+        );
+        while(cursor.moveToNext()) {
+            int titleIndex = cursor.getColumnIndex("title");
+            int idIndex = cursor.getColumnIndex("id");
+            int id = cursor.getInt(idIndex);
+            String title = cursor.getString(titleIndex);
+            tags.add(new AbstractTag(id, title));
+        }
+        cursor.close();
+        return new Tag(tagId, tagTitle, tags);
+    }
+    public Image getImageByUri(Uri targetUri) {
+        Cursor cursor = db.query(
+                "Image",
+                null,
+                "uri = '" + targetUri.toString() + "'",
+                null,
+                null,
+                null,
+                null
+        );
+        while (cursor.moveToNext()) {
+            int idIndex = cursor.getColumnIndex("id");
+            int uriIndex = cursor.getColumnIndex("uri");
+            int descriptionIndex = cursor.getColumnIndex("description");
+            int timeIndex = cursor.getColumnIndex("createTime");
+            int id = cursor.getInt(idIndex);
+            Date time = new Date(cursor.getLong(timeIndex));
+            Uri uri = Uri.parse(cursor.getString(uriIndex));
+            String description = cursor.getString(descriptionIndex);
+            return new Image(id, uri, description, time);
         }
         return null;
     }
+    public Image getImageById(int targetId) {
+        Cursor cursor = db.query(
+                "Image",
+                null,
+                "id = " + targetId,
+                null,
+                null,
+                null,
+                null
+        );
+        return null;
+    }
 
-
-    public int insertTag(AbstractTag parent, AbstractTag newTag) {
-        String sql = "INSERT INTO Tag (id, title, parentId) VALUES (" + newTag.getId() + ", '" + newTag.getTitle() + "', " + parent.getId() + ");";
-        db.execSQL(sql);
-        return 0; // FIXME: Return what?
+    public AbstractTag insertTag(AbstractTag parent, String title) {
+        ContentValues values = new ContentValues();
+        values.put("title", title);
+        values.put("parentId", parent.getId());
+        long id = db.insert(
+                "Tag",
+                null,
+                values
+        );
+        return new AbstractTag(Long.valueOf(id).intValue(), title);
     }
     public void updateTagTitle(int targetId, String title) {
         String sql = "UPDATE Tag SET title = '" + title + "' WHERE id = " + targetId + ";";
@@ -129,10 +190,35 @@ public class ImageDatabaseManager extends DBManager {
         db.execSQL(sql);
     }
 
-    public int insertImage(Image image) {
-        String sql = "INSERT INTO Image (uri, createTime, description) VALUES ('" + image.getUri().toString() + "', " + image.getCreateTime().getTime() + ", '" + image.getDescription() + "');";
-        db.execSQL(sql);
-        return 0; // FIXME: Return what?
+    public Image insertImage(Uri uri, String description, List<AbstractTag> tags) {
+        ContentValues values = new ContentValues();
+        values.put("uri", uri.toString());
+        values.put("description", description);
+        long id = db.insert(
+                "Image",
+                null,
+                values
+        );
+        long time = 0;
+        Cursor cursor = db.query(
+                "Image",
+                null,
+                "id = " + id,
+                null,
+                null,
+                null,
+                null
+        );
+        while(cursor.moveToNext()) {
+            int timeIndex = cursor.getColumnIndex("createTime");
+            time = cursor.getLong(timeIndex);
+        }
+        for(AbstractTag tag : tags) {
+            String sql = "INSERT INTO Belong (imageId, tagId) VALUES (" + id + ", " + tag.getId() + ");";
+            db.execSQL(sql);
+        }
+        cursor.close();
+        return new Image(Long.valueOf(id).intValue(), uri, description, new Date(time));
     }
     public void updateImageUri(int targetId, Uri uri) {
         String sql = "UPDATE Image SET uri = '" + uri.toString() + "' WHERE id = " + targetId + ";";
