@@ -11,7 +11,7 @@ import java.util.List;
  * Created by rtnelo on 16-12-6.
  */
 
-public class DatabaseManager {
+public class DatabaseManager implements DBManager {
     private static DatabaseManager db;
 
     private ArrayList<Image> images;

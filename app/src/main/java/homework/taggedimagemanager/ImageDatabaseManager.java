@@ -41,7 +41,7 @@ public class ImageDatabaseManager implements DBManager {
             int createTimeIndex = cursor.getColumnIndex("description");
             int id = cursor.getInt(idIndex);
             String uri = cursor.getString(uriIndex);
-            Date createTime = new Date(cursor.getInt(createTimeIndex)); //FIXME: Unknown return type.
+            Date createTime = new Date(cursor.getLong(createTimeIndex)); //FIXME: Unknown return type.
             String description = cursor.getString(descriptionIndex);
             images.add(new Image(id, Uri.parse(uri), description, createTime));
         }
