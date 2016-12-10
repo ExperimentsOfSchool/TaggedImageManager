@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import homework.taggedimagemanager.model.AbstractTag;
-import homework.taggedimagemanager.model.DatabaseManager;
+import homework.taggedimagemanager.model.DBManager;
 import homework.taggedimagemanager.model.Image;
 
 public class DetailActivity extends AppCompatActivity {
@@ -24,7 +24,7 @@ public class DetailActivity extends AppCompatActivity {
     private EditText descriptionText;
     private TagHorizontalListView tagList;
 
-    private DatabaseManager db;
+    private DBManager db;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -49,9 +49,17 @@ public class DetailActivity extends AppCompatActivity {
         descriptionText = (EditText)findViewById(R.id.descriptionText);
         tagList = (TagHorizontalListView)findViewById(R.id.tagList);
 
-        db = DatabaseManager.getInstance();
+        db = ImageDatabaseManager.getInstance();
 
         Intent arguments = this.getIntent();
+
+        imageSwitchViewer.setOnChange(new ImageSwitchViewer.OnChangeCallback() {
+            @Override
+            public void callback(Uri uri) {
+                onChange(uri);
+            }
+        });
+
         newImage = arguments.getBooleanExtra("newImage", false);
         if (!newImage) {
             List<Image> images = (List<Image>) arguments.getSerializableExtra("images");
@@ -91,6 +99,7 @@ public class DetailActivity extends AppCompatActivity {
         Image image = db.getImageByUri(uri);
         descriptionText.setText(image.getDescription());
         tagList.setTags(image.getTags());
+        Log.w("OnChange", "onChange" + image.getTags().toString());
     }
 
     public void onSave(View view) {

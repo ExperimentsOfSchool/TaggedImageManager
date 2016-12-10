@@ -81,12 +81,18 @@ public class TagHorizontalListView extends RecyclerView {
 
         LinearLayoutManager layoutManager= new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         setLayoutManager(layoutManager);
+        setTags(new ArrayList<AbstractTag>());
     }
 
     public void setTags(List<AbstractTag> tags) {
         TagListAdapter tagListAdapter = (TagListAdapter)this.getAdapter();
-        tagListAdapter.setTags(tags);
-        tagListAdapter.notifyDataSetChanged();
+        if (tagListAdapter == null) {
+            tagListAdapter = new TagListAdapter(tags);
+            this.setAdapter(tagListAdapter);
+        } else {
+            tagListAdapter.setTags(tags);
+            tagListAdapter.notifyDataSetChanged();
+        }
     }
 
     public List<AbstractTag> getTags() {

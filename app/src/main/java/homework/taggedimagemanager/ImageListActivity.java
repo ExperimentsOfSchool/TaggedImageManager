@@ -12,7 +12,6 @@ import android.view.View;
 
 import java.io.Serializable;
 
-import homework.taggedimagemanager.model.DatabaseManager;
 import homework.taggedimagemanager.model.Image;
 
 public class ImageListActivity extends AppCompatActivity {
@@ -29,6 +28,8 @@ public class ImageListActivity extends AppCompatActivity {
 
         dbHelper = new ImageDBHelper(getApplicationContext());
 
+        ImageDatabaseManager.initialize(dbHelper);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,7 +45,7 @@ public class ImageListActivity extends AppCompatActivity {
                 startDetailActivity(image, position);
             }
         });
-        imageList.setImages(DatabaseManager.getInstance().searchImage(""));
+        imageList.setImages(ImageDatabaseManager.getInstance().searchImage(""));
 
         ImageSearcher search = (ImageSearcher)findViewById(R.id.search);
         search.setOnQueryTextListener(new ImageSearcher.OnQueryTextListener() {
@@ -63,7 +64,7 @@ public class ImageListActivity extends AppCompatActivity {
     }
 
     private void searchImage(String keywords) {
-        imageList.setImages(DatabaseManager.getInstance().searchImage(keywords));
+        imageList.setImages(ImageDatabaseManager.getInstance().searchImage(keywords));
     }
 
     private void startDetailActivity(Image image, int position) {

@@ -24,15 +24,21 @@ public class ImageDatabaseManager implements DBManager {
         this.db = dbHelper.getReadableDatabase();
     }
     public List<Image> searchImage(String keyword) {
-        Cursor cursor = db.query(
-                "Image",
-                null,
-                "description like %" + keyword + "%",
-                null,
-                null,
-                null,
-                null
-                );
+        Cursor cursor;
+        if (keyword.equals("")) {
+            cursor = db.query("Image", null, null, null, null, null, null);
+        } else {
+            cursor = db.query(
+                    "Image",
+                    null,
+                    "description like %" + keyword + "%",
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        }
+
         List<Image> images = new ArrayList<>();
         while(cursor.moveToNext()) {
             int idIndex = cursor.getColumnIndex("id");
@@ -241,13 +247,11 @@ public class ImageDatabaseManager implements DBManager {
         db.execSQL(sql);
     }
 
-    public DBManager getInstance(ImageDBHelper dbHelper) {
-        if(singleton == null) {
-            singleton = new ImageDatabaseManager(dbHelper);
-        } else {
-            this.dbHelper = dbHelper;
-            this.db = dbHelper.getReadableDatabase();
-        }
+    public static DBManager getInstance() {
         return singleton;
+    }
+
+    public static void initialize(ImageDBHelper dbHelper) {
+        singleton = new ImageDatabaseManager(dbHelper);
     }
 }

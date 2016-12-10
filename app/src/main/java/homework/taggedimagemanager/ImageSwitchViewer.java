@@ -191,7 +191,7 @@ public class ImageSwitchViewer extends ImageSwitcher {
             setOutAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.slide_out_right));
             setInAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.slide_in_left));
 
-            Uri newUri = uris.get(--currentIndex % uris.size());
+            Uri newUri = uris.get(Math.abs(--currentIndex % uris.size()));
             this.callOnChange(newUri);
             this.setImageURI(newUri);
         }

@@ -17,7 +17,6 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 
 import homework.taggedimagemanager.model.AbstractTag;
-import homework.taggedimagemanager.model.DatabaseManager;
 import homework.taggedimagemanager.model.Tag;
 
 public class TagActivity extends AppCompatActivity {
@@ -97,7 +96,7 @@ public class TagActivity extends AppCompatActivity {
     }
 
     private void addTag(String title) {
-        AbstractTag tag = DatabaseManager.getInstance().insertTag(root, title);
+        AbstractTag tag = ImageDatabaseManager.getInstance().insertTag(root, title);
     }
 
     private void addTagDialog() {
@@ -130,7 +129,7 @@ public class TagActivity extends AppCompatActivity {
 
     private void openTagActivity(AbstractTag tag) {
         Intent intent = new Intent(this, TagActivity.class);
-        Tag fullTag = DatabaseManager.getInstance().getFullTag(tag);
+        Tag fullTag = ImageDatabaseManager.getInstance().getFullTag(tag);
         intent.putExtra("root", fullTag);
         intent.putExtra("children", fullTag.getChildren());
         startActivityForResult(intent, OPEN_TAG_ACTIVITY);

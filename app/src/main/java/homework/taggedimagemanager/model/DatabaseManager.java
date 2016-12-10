@@ -3,6 +3,7 @@ package homework.taggedimagemanager.model;
 import android.net.Uri;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,19 +20,24 @@ public class DatabaseManager implements DBManager {
 
     private DatabaseManager() {
         images = new ArrayList<Image>();
-        images.add(new Image(1, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3324634.gif"), "1"));
-        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3"));
-        images.add(new Image(4, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3335544.gif"), "4"));
-        images.add(new Image(6, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3326557.gif"), "6"));
-        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3"));
-        images.add(new Image(4, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3335544.gif"), "4"));
-        images.add(new Image(6, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3326557.gif"), "6"));
-        images.add(new Image(1, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3324634.gif"), "1"));
-        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3"));
-        images.add(new Image(4, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3335544.gif"), "4"));
-        images.add(new Image(6, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3326557.gif"), "6"));
-        images.add(new Image(1, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3324634.gif"), "1"));
-        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3"));
+        ArrayList<AbstractTag> tags = new ArrayList<AbstractTag>();
+        tags.add(new AbstractTag(1, "tag1"));
+        tags.add(new AbstractTag(2, "tag2"));
+        tags.add(new AbstractTag(3, "tag3"));
+
+        images.add(new Image(1, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3324634.gif"), "1", new Date(), tags));
+        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3", new Date(), tags));
+        images.add(new Image(4, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3335544.gif"), "4", new Date(), tags));
+        images.add(new Image(6, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3326557.gif"), "6", new Date(), tags));
+        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3", new Date(), tags));
+        images.add(new Image(4, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3335544.gif"), "4", new Date(), tags));
+        images.add(new Image(6, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3326557.gif"), "6", new Date(), tags));
+        images.add(new Image(1, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3324634.gif"), "1", new Date(), tags));
+        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3", new Date(), tags));
+        images.add(new Image(4, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3335544.gif"), "4", new Date(), tags));
+        images.add(new Image(6, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3326557.gif"), "6", new Date(), tags));
+        images.add(new Image(1, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3324634.gif"), "1", new Date(), tags));
+        images.add(new Image(3, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3336661.gif"), "3", new Date(), tags));
         images.add(new Image(4, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3335544.gif"), "4"));
         images.add(new Image(6, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3326557.gif"), "6"));
         images.add(new Image(1, Uri.parse("file:///storage/sdcard1/Wowtu/Download/3324634.gif"), "1"));
