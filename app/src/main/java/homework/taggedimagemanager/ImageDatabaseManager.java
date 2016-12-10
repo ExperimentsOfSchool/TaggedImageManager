@@ -22,7 +22,7 @@ public class ImageDatabaseManager extends DBManager {
     public List<Image> searchImage(String keyword) {
         Cursor cursor = db.query("Image",
                 null,
-                "  ",
+                "description like %" + keyword + "%",
                 null,
                 null,
                 null,
@@ -32,7 +32,7 @@ public class ImageDatabaseManager extends DBManager {
     public List<AbstractTag> searchTag(String keyword) {
         Cursor cursor = db.query("Tag",
                 null,
-                " = ",
+                "title like %" + keyword + "%",
                 null,
                 null,
                 null,
