@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Created by Lawrence on 10/12/2016.
+ *
  */
 public class ImageDatabaseManager extends DBManager {
     private static ImageDatabaseManager singleton;
@@ -28,6 +29,12 @@ public class ImageDatabaseManager extends DBManager {
                 null,
                 null
                 );
+        while(cursor.moveToNext()) {
+            int idIndex = cursor.getColumnIndex("id");
+            int uriIndex = cursor.getColumnIndex("uri");
+            int descriptionIndex = cursor.getColumnIndex("createTime");
+            int createTimeIndex;
+        }
     }
     public List<AbstractTag> searchTag(String keyword) {
         Cursor cursor = db.query("Tag",
