@@ -31,7 +31,7 @@ public class ImageDatabaseManager implements DBManager {
             cursor = db.query(
                     "Image",
                     null,
-                    "description like '%" + keyword + "%",
+                    "description like %'" + keyword + "'%",
                     null,
                     null,
                     null,
