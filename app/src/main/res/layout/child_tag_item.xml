@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="32dp"
+    android:id="@+id/childTagItem">
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_weight="1" />
+
+    <Button
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/deleteBtn"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:background="@android:drawable/ic_delete"
+        android:visibility="gone" />
+
+    <Button
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/editBtn"
+        android:layout_weight="1"
+        android:background="@android:drawable/ic_menu_edit"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:visibility="gone" />
+</LinearLayout>

@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +21,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private int resultCode;
     private ImageSwitchViewer imageSwitchViewer;
-    private ListView tagList;
     private EditText descriptionText;
+    private TagHorizontalListView tagList;
 
     private DatabaseManager db;
 
@@ -47,8 +46,8 @@ public class DetailActivity extends AppCompatActivity {
 
         resultCode = RESULT_CANCELED;
         imageSwitchViewer = (ImageSwitchViewer)findViewById(R.id.imageSwitcher);
-        tagList = (ListView)findViewById(R.id.tagList);
         descriptionText = (EditText)findViewById(R.id.descriptionText);
+        tagList = (TagHorizontalListView)findViewById(R.id.tagList);
 
         db = DatabaseManager.getInstance();
 
@@ -64,6 +63,8 @@ public class DetailActivity extends AppCompatActivity {
             }
             imageSwitchViewer.setUris(uris);
             imageSwitchViewer.setCurrentIndex((arguments.getIntExtra("currentIndex", uris.size() / 2)));
+        } else {
+            chooseImage();
         }
     }
 
@@ -89,6 +90,7 @@ public class DetailActivity extends AppCompatActivity {
     private void onChange(Uri uri) {
         Image image = db.getImageByUri(uri);
         descriptionText.setText(image.getDescription());
+        tagList.setTags(image.getTags());
     }
 
     public void onSave(View view) {
@@ -96,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
             Intent result = new Intent();
             if (resultCode == RESULT_OK) {
                 Log.w("DetailOnSave", "startInsert");
-                Image newImage = db.insertImage(imageSwitchViewer.getCurrentUri(), descriptionText.getText().toString(), new ArrayList<AbstractTag>());
+                Image newImage = db.insertImage(imageSwitchViewer.getCurrentUri(), descriptionText.getText().toString(), tagList.getTags());
                 Log.w("DetailOnSave", "startSerialize");
                 result.putExtra("newImage", newImage);
             }
@@ -106,8 +108,13 @@ public class DetailActivity extends AppCompatActivity {
         } else {
             Image currentImage = db.getImageByUri(imageSwitchViewer.getCurrentUri());
             String description = descriptionText.getText().toString();
+            List<AbstractTag> tags = tagList.getTags();
+
             if (!description.equals(currentImage.getDescription())) {
                 db.updateImageDescription(currentImage.getId(), description);
+            }
+            if (!currentImage.getTags().equals(tags)) {
+                db.updateImageTags(currentImage.getId(), tags);
             }
         }
     }

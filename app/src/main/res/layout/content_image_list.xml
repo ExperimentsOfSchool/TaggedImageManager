@@ -13,7 +13,7 @@
     tools:context="homework.taggedimagemanager.ImageListActivity"
     tools:showIn="@layout/activity_image_list">
 
-    <SearchView
+    <homework.taggedimagemanager.ImageSearcher
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/search" />

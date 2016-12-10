@@ -45,6 +45,25 @@ public class ImageListActivity extends AppCompatActivity {
             }
         });
         imageList.setImages(DatabaseManager.getInstance().searchImage(""));
+
+        ImageSearcher search = (ImageSearcher)findViewById(R.id.search);
+        search.setOnQueryTextListener(new ImageSearcher.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                ImageListActivity.this.searchImage(s);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+    }
+
+    private void searchImage(String keywords) {
+        imageList.setImages(DatabaseManager.getInstance().searchImage(keywords));
     }
 
     private void startDetailActivity(Image image, int position) {

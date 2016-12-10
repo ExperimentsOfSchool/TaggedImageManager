@@ -40,6 +40,7 @@ public class ImageDatabaseManager extends DBManager {
         );
 
     }
+
     public Tag getFullTag(AbstractTag abstractTag) {
     }
 
