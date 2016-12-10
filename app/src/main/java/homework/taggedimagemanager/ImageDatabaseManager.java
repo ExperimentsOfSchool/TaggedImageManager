@@ -24,20 +24,15 @@ public class ImageDatabaseManager implements DBManager {
         this.db = dbHelper.getReadableDatabase();
     }
     public List<Image> searchImage(String keyword) {
-        Cursor cursor;
-        if (keyword.equals("")) {
-            cursor = db.query("Image", null, null, null, null, null, null);
-        } else {
-            cursor = db.query(
+        Cursor cursor = db.query(
                     "Image",
                     null,
-                    "description like %'" + keyword + "'%",
+                    keyword.equals("") ? null: "description like '%" + keyword + "%'",
                     null,
                     null,
                     null,
                     null
             );
-        }
 
         List<Image> images = new ArrayList<>();
         while(cursor.moveToNext()) {
@@ -58,7 +53,7 @@ public class ImageDatabaseManager implements DBManager {
         Cursor cursor = db.query(
                 "Tag",
                 null,
-                "title like %" + keyword + "%",
+                keyword.equals("") ? null: "title like '%" + keyword + "%'",
                 null,
                 null,
                 null,

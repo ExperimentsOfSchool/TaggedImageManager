@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import homework.taggedimagemanager.model.Image;
 public class DetailActivity extends AppCompatActivity {
     private boolean newImage;
     private final int IMAGE_CHOOSE_CODE = 1;
+    private final int TAG_CHOOSE_CODE = 2;
 
     private int resultCode;
     private ImageSwitchViewer imageSwitchViewer;
@@ -29,14 +31,24 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.w("onActivityResult", String.valueOf(requestCode) + " " + String.valueOf(resultCode));
-        this.resultCode = resultCode == RESULT_OK ? RESULT_OK : resultCode;
+        if (this.resultCode != RESULT_OK) {
+            this.resultCode = resultCode;
+        }
         switch (requestCode) {
             case IMAGE_CHOOSE_CODE:
                 if (resultCode == RESULT_OK) {
                     imageSwitchViewer.setImageURI(data.getData());
                 }
                 break;
+            case TAG_CHOOSE_CODE:
+                if (resultCode == RESULT_OK) {
+                    addTag((AbstractTag)data.getSerializableExtra("tag"));
+                }
         }
+    }
+
+    private void addTag(AbstractTag tag) {
+        tagList.addTag(tag);
     }
 
     @Override
@@ -50,6 +62,8 @@ public class DetailActivity extends AppCompatActivity {
         tagList = (TagHorizontalListView)findViewById(R.id.tagList);
 
         db = ImageDatabaseManager.getInstance();
+
+        resultCode = RESULT_CANCELED;
 
         Intent arguments = this.getIntent();
 
@@ -126,5 +140,11 @@ public class DetailActivity extends AppCompatActivity {
                 db.updateImageTags(currentImage.getId(), tags);
             }
         }
+    }
+
+    public void addTagActivity() {
+        Intent intent = new Intent(this, TagActivity.class);
+        intent.putExtra("children", (Serializable)ImageDatabaseManager.getInstance().searchTag(""));
+        startActivityForResult(intent, TAG_CHOOSE_CODE);
     }
 }
