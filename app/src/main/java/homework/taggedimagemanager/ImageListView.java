@@ -65,7 +65,9 @@ public class ImageListView extends GridView {
 
             public void setImage(Image image, int size) {
                 this.image = image;
-                Bitmap bitmap = BitmapFactory.decodeFile(image.getUri().getPath());
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 3;
+                Bitmap bitmap = BitmapFactory.decodeFile(image.getUri().getPath(), options);
                 if (bitmap.getHeight() > size * 2 || bitmap.getWidth() > size * 2) {
                     bitmap = ThumbnailUtils.extractThumbnail(bitmap, size, size);
                 }
